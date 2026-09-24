@@ -1,0 +1,81 @@
+/* Gemeinsames Stylesheet für alle Lektionen und Referenzen dieses Workspaces.
+   Einbinden mit: <link rel="stylesheet" href="../assets/style.css"> */
+
+:root {
+  --bg: #fffff8;
+  --fg: #111;
+  --muted: #5f5f5f;
+  --accent: #a00000;
+  --rule: #ddd;
+  --code-bg: #f4f1e8;
+  --ok: #2e7d32;
+  --err: #c62828;
+  --measure: 38rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151515;
+    --fg: #ddd;
+    --muted: #999;
+    --accent: #ff8a80;
+    --rule: #333;
+    --code-bg: #222;
+    --ok: #81c784;
+    --err: #ef9a9a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  padding: 3rem 1rem 5rem;
+  max-width: var(--measure);
+  background: var(--bg);
+  color: var(--fg);
+  font: 1.125rem/1.6 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+h1, h2, h3 { font-weight: 400; line-height: 1.25; }
+h1 { font-size: 2.2rem; margin-bottom: 0.25rem; }
+h2 { font-size: 1.5rem; margin-top: 2.5rem; font-style: italic; }
+.subtitle { color: var(--muted); font-style: italic; margin-top: 0; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; }
+code { background: var(--code-bg); padding: 0.1em 0.3em; border-radius: 3px; }
+pre { background: var(--code-bg); padding: 1rem; overflow-x: auto; border-radius: 4px; }
+pre code { background: none; padding: 0; }
+
+/* Randnotiz / Quellenangabe */
+.sidenote { font-size: 0.9rem; color: var(--muted); border-left: 2px solid var(--rule); padding-left: 0.75rem; }
+
+/* Kästen */
+.callout { border: 1px solid var(--rule); border-radius: 4px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+.callout--source::before { content: "Primärquelle"; display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.callout--ask::before { content: "Unklar? Frag Claude."; display: block; font-weight: 600; }
+
+/* Quiz */
+.quiz { margin: 1.5rem 0; }
+.quiz button {
+  display: block; width: 100%; text-align: left; margin: 0.4rem 0; padding: 0.6rem 0.9rem;
+  font: inherit; color: inherit; background: transparent;
+  border: 1px solid var(--rule); border-radius: 4px; cursor: pointer;
+}
+.quiz button:hover { border-color: var(--fg); }
+.quiz button.correct { border-color: var(--ok); color: var(--ok); }
+.quiz button.wrong { border-color: var(--err); color: var(--err); }
+.quiz .feedback { min-height: 1.6em; font-style: italic; }
+
+/* Navigation zwischen Lektionen */
+nav.lesson-nav { display: flex; justify-content: space-between; margin-top: 3rem; font-size: 0.95rem; }
+
+@media print {
+  :root { --bg: #fff; --fg: #000; }
+  body { padding: 0; max-width: none; font-size: 11pt; }
+  a { color: inherit; }
+  .quiz button, nav.lesson-nav, .callout--ask { display: none; }
+}
