@@ -14,9 +14,11 @@
   Warum 0,5 selten passt und wie man die Schwelle nach dem Ziel der Anwendung wählt. F-beta gewichtet P und R unterschiedlich. Use for: Schwellenwahl (Lektion 2, 6).
 - [Rafael Padilla: Object-Detection-Metrics (GitHub)](https://github.com/rafaelpadilla/Object-Detection-Metrics)
   Vorarbeit zum Artikel von 2021, mit klaren Bildern zu IoU, TP/FP/FN (TN „does not apply“), Doppel-Detektionen und AP-Kurven. Use for: Lektion 3–4.
+- [pycocotools `cocoeval.py` (cocodataset/cocoapi)](https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py)
+  Referenzimplementierung der COCO-Metriken: 10 IoU-Schwellen .50:.05:.95, 101 Recall-Stufen, Glättung in `accumulate`. Use for: exakte AP-Rechnung (Lektion 4).
 - [RF-DETR Quellcode (roboflow/rf-detr)](https://github.com/roboflow/rf-detr)
   Maßgeblich dafür, was *unsere* Tabelle zeigt. Geprüft in v1.10.1: `rfdetr/utilities/console.py` (Tabelle),
-  `rfdetr/evaluation/f1_sweep.py` + `rfdetr/training/callbacks/coco_eval.py` (F1 sweep). Use for: Details der Spalten.
+  `rfdetr/evaluation/f1_sweep.py` + `rfdetr/training/callbacks/coco_eval.py` (F1 sweep), `rfdetr/evaluation/matching.py` (Matching), `rfdetr/config.py` (`best_model_metric`, `eval_max_dets`). Use for: Details der Spalten.
 
 ## Wisdom (Communities)
 

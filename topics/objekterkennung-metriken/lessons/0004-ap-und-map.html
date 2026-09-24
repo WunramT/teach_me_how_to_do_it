@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Die ganze Kurve in einer Zahl</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<h1>Die ganze Kurve in einer Zahl</h1>
+<p class="subtitle">Lektion 4 · AP, mAP 50, 75 und 50:95 · ca. 15 Minuten</p>
+
+<p>Heute bekommt die linke Gruppe der Tabelle ihre Bedeutung:</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th colspan="3">mAP</th><th>mAR</th><th colspan="3">F1 sweep</th></tr>
+  <tr><td><b>50:95</b></td><td><b>50</b></td><td><b>75</b></td><td>@500</td><td>F1</td><td>Prec</td><td>Recall</td></tr>
+</table>
+</div>
+
+<p>Der F1 sweep sucht die <i>eine</i> beste Konfidenzschwelle. AP bewertet stattdessen <i>alle</i> Schwellen auf einmal.
+Nach dieser Lektion kannst du die drei mAP-Werte lesen und aus ihrer Differenz etwas über eure Boxen ablesen.
+Du weißt dann auch, wann mAP für eure Entscheidung taugt und wann nicht.</p>
+
+<h2>Aufwärmen</h2>
+
+<div class="quiz">
+  <p>Eine Box erreicht die IoU-Schwelle nicht. Was zählt die Auswertung?</p>
+  <button data-why="Die Box ist zwar ein Fehlalarm, aber das Objekt darunter bleibt zusätzlich unentdeckt.">nur ein FP</button>
+  <button data-ok data-why="Doppelte Strafe: Die Box ist ein FP, das Objekt ein FN.">FP und FN</button>
+  <button data-why="Das Objekt ist zwar ein FN, aber die Box selbst zählt zusätzlich als Fehlalarm.">nur ein FN</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>Wie gewichtet F1 Fehlalarme und Übersehenes?</p>
+  <button data-why="F1 ist symmetrisch. Wer FP stärker gewichten will, nimmt F-beta mit β &lt; 1.">FP stärker gewichtet</button>
+  <button data-why="F1 ist symmetrisch. F-beta mit β &gt; 1 würde FN stärker gewichten.">FN stärker gewichtet</button>
+  <button data-ok data-why="Deshalb passt die F1-Schwelle nicht automatisch zu eurer Prüfung.">beide gleich stark</button>
+  <p class="feedback"></p>
+</div>
+
+<h2>Von der Rangliste zur Kurve</h2>
+
+<p>AP braucht keine Konfidenzschwelle. Die Boxen einer Klasse werden nach Konfidenz sortiert und dann von oben nach unten
+durchgegangen. Nach jeder Box rechnet man Precision und Recall aus: „Wenn ich genau hier abschneide, wie gut ist das Modell?“
+Jeder dieser Punkte ist eine mögliche Schwelle. Zusammen ergeben sie die <b>Precision-Recall-Kurve</b>
+(<a href="https://github.com/rafaelpadilla/Object-Detection-Metrics">Padilla</a>).</p>
+
+<p><b>AP</b> (Average Precision) ist grob die <b>Fläche unter dieser Kurve</b>. COCO rechnet sie in drei Schritten
+(<code>pycocotools/cocoeval.py</code>, Funktion <code>accumulate</code>):</p>
+<ol>
+  <li><b>Glätten:</b> Jeder Punkt bekommt die höchste Precision, die rechts von ihm noch vorkommt. Aus dem Zickzack wird eine fallende Treppe.</li>
+  <li><b>Ablesen:</b> Die Treppe wird an 101 Recall-Stufen abgelesen: 0,00, 0,01 bis 1,00. Recall-Stufen, die das Modell nie erreicht, zählen <b>0</b>.</li>
+  <li><b>Mitteln:</b> AP ist der Durchschnitt dieser 101 Werte.</li>
+</ol>
+
+<p><b>mAP</b> ist das Mittel der AP-Werte über die Klassen, bei euch also (AP Stempel + AP Unterschrift) / 2.
+COCO unterscheidet AP und mAP nicht (<a href="https://cocodataset.org/#detection-eval">COCO Detection Evaluation</a>).</p>
+
+<h2>Die AP-Werkstatt</h2>
+
+<p>Das hier ist die Klasse <b>Stempel</b> mit denselben Boxen wie in Lektion 2. Jetzt kennst du auch den IoU jeder Box.
+Im Set gibt es <b>5 echte Stempel</b>. Einen davon findet das Modell nie. Schalte zwischen IoU 0,50 und 0,75 um.</p>
+
+<div class="apc" data-gt="5" data-label="Stempel" data-dets='[
+  {"s":0.95,"iou":0.91,"l":"Firmenstempel"},
+  {"s":0.90,"iou":0.72,"l":"Eingangsstempel"},
+  {"s":0.80,"iou":0,"l":"Logo im Briefkopf"},
+  {"s":0.72,"iou":0.83,"l":"Notarstempel"},
+  {"s":0.55,"iou":0.10,"l":"Rundes Wasserzeichen"},
+  {"s":0.38,"iou":0.58,"l":"Blasser Stempel"},
+  {"s":0.30,"iou":0,"l":"Scanfleck"}
+]'></div>
+
+<details>
+  <summary>Was fällt dir auf?</summary>
+  <ul>
+    <li>Bei <b>IoU 0,50</b> ergibt sich AP 0,69. Der Recall endet bei 0,80, weil ein Stempel nie gefunden wird. Die Recall-Stufen 0,81 bis 1,00 zählen 0, das kostet fast ein Fünftel der Fläche.</li>
+    <li>Bei <b>IoU 0,75</b> fällt die AP auf 0,31. Zwei Boxen sitzen zu locker, der Eingangsstempel (0,72) und der blasse Stempel (0,58). Der Eingangsstempel ist besonders teuer, weil er mit Konfidenz 0,90 weit oben steht. Sein FP drückt die Precision schon ganz am Anfang der Kurve.</li>
+    <li><b>AP 50:95</b> ist das Mittel von 10 AP-Werten bei IoU 0,50, 0,55 bis 0,95. Hier ergibt das 0,41. Bei IoU 0,95 ist die AP 0, keine Box sitzt so genau.</li>
+  </ul>
+</details>
+
+<h2>Die drei mAP-Spalten lesen</h2>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Spalte</th><th>Fragt</th><th>Für eure Prüfung</th></tr>
+  <tr><td><b>mAP 50</b></td><td>Findet das Modell die Objekte, wenn die Boxen nur grob sitzen müssen?</td><td>Am nächsten an eurer Frage „Ist da eine Unterschrift?“</td></tr>
+  <tr><td><b>mAP 75</b></td><td>Sitzen die Boxen auch eng?</td><td>Wichtig nur, wenn ihr den Ausschnitt weiterverarbeitet, z. B. für einen Unterschriftsvergleich</td></tr>
+  <tr><td><b>mAP 50:95</b></td><td>Wie gut ist das Modell, gemittelt über lockere bis pixelgenaue Boxen?</td><td>Standardkriterium von RF-DETR für den besten Checkpoint</td></tr>
+</table>
+</div>
+
+<p><b>Aus der Differenz lesen:</b> Ist mAP 50 hoch und mAP 75 deutlich niedriger, findet das Modell die Objekte, aber die Boxen sitzen locker.
+Nach der Hypothese aus Lektion 3 ist das für euch meist harmlos. Ist schon mAP 50 niedrig, übersieht das Modell Objekte oder
+erfindet sichere Fehlalarme. Das betrifft eure Prüfung direkt.</p>
+
+<div class="callout">
+  <p><b>Der „beste“ Checkpoint:</b> RF-DETR wählt ihn standardmäßig nach <b>mAP 50:95</b>
+  (<code>best_model_metric="map"</code> in <code>rfdetr/config.py</code>, Version 1.10.1). Das bevorzugt Modelle mit pixelgenauen Boxen.
+  Ein Checkpoint mit besserem mAP 50, aber lockeren Boxen kann dabei verlieren, obwohl er für euch der bessere wäre.
+  Die Alternative <code>best_model_metric="mar"</code> lernst du in Lektion 5 kennen.</p>
+</div>
+
+<h2>Was AP <i>nicht</i> sagt</h2>
+
+<p>AP bewertet die <b>Rangfolge über alle Schwellen</b>. Im Betrieb arbeitet euer Modell aber an <b>einer</b> Schwelle.
+Zwei Modelle mit gleicher AP können sich an eurer Schwelle deutlich unterscheiden. AP eignet sich deshalb gut, um
+Modelle und Checkpoints zu <b>vergleichen</b>. Ob das Modell für die Vollständigkeitsprüfung <b>reicht</b>, entscheiden
+Precision und Recall an eurer Schwelle. Genauer ist es noch, pro Dokument zu prüfen, ob alles erkannt wurde. Das machen wir in Lektion 6.</p>
+
+<h2>Übung: AP von Hand</h2>
+
+<p>Klasse Unterschrift, 4 echte Unterschriften im Set. Das Modell liefert 4 Boxen, nach Konfidenz sortiert:
+<b>TP, TP, FP, TP</b>. Trage Precision und Recall nach jeder Box ein und schätze dann die AP.</p>
+
+<form class="exercise">
+  <div class="row"><label for="ex4-p1">Rang 1: P</label><input id="ex4-p1" inputmode="decimal" data-answer="1" data-tol="0.01"><label for="ex4-r1">R</label><input id="ex4-r1" inputmode="decimal" data-answer="0.25" data-tol="0.01"></div>
+  <div class="row"><label for="ex4-p2">Rang 2: P</label><input id="ex4-p2" inputmode="decimal" data-answer="1" data-tol="0.01"><label for="ex4-r2">R</label><input id="ex4-r2" inputmode="decimal" data-answer="0.5" data-tol="0.01"></div>
+  <div class="row"><label for="ex4-p3">Rang 3: P</label><input id="ex4-p3" inputmode="decimal" data-answer="0.6667" data-tol="0.01"><label for="ex4-r3">R</label><input id="ex4-r3" inputmode="decimal" data-answer="0.5" data-tol="0.01"></div>
+  <div class="row"><label for="ex4-p4">Rang 4: P</label><input id="ex4-p4" inputmode="decimal" data-answer="0.75" data-tol="0.01"><label for="ex4-r4">R</label><input id="ex4-r4" inputmode="decimal" data-answer="0.75" data-tol="0.01"></div>
+  <div class="row"><label for="ex4-ap">AP (ungefähr)</label><input id="ex4-ap" inputmode="decimal" data-answer="0.69" data-tol="0.03"></div>
+  <p class="sidenote">Tipp für die AP: Glätten, dann die Fläche der Treppe als Summe von Rechtecken rechnen. Recall über 0,75 zählt 0.</p>
+  <button>Prüfen</button>
+  <p class="feedback" data-done="Geglättet ergibt sich Precision 1,0 bis Recall 0,50 und dann 0,75 bis Recall 0,75. Die Fläche ist 0,50 · 1,0 + 0,25 · 0,75 ≈ 0,69. Mit den 101 COCO-Stufen kommt ebenfalls 0,69 heraus. Hätte das Modell die vierte Unterschrift noch gefunden, wäre die ganze Fläche bis Recall 1,00 dazugekommen."></p>
+</form>
+
+<h2>Abrufen</h2>
+
+<div class="quiz">
+  <p>1. Was fasst AP zusammen?</p>
+  <button data-why="Das wäre ein einzelner Punkt der Kurve, wie im F1 sweep.">Precision bei einer Schwelle</button>
+  <button data-ok data-why="AP ist die Fläche unter der geglätteten Precision-Recall-Kurve über alle Schwellen.">die ganze Precision-Recall-Kurve</button>
+  <button data-why="IoU entscheidet nur, was TP ist. Gemittelt wird die Precision.">den Mittelwert aller IoUs</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>2. Einer von 5 Stempeln wird bei keiner Schwelle gefunden. Was macht das mit der AP?</p>
+  <button data-why="Nicht erreichte Recall-Stufen gehen mit Precision 0 in die AP ein.">AP bleibt davon völlig unberührt</button>
+  <button data-ok data-why="Der Recall endet bei 0,80. Die Stufen 0,81 bis 1,00 zählen 0 und fehlen in der Fläche.">Recall-Stufen über 0,80 zählen null</button>
+  <button data-why="Ein nie gefundenes Objekt ist ein FN und begrenzt den Recall, nicht die Precision.">Nur die Precision sinkt dadurch</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>3. mAP 50 = 0,90 und mAP 75 = 0,55. Was heißt das?</p>
+  <button data-why="Dann wäre schon mAP 50 niedrig.">Übersieht viele Objekte schon grob</button>
+  <button data-why="Fehlalarme würden schon mAP 50 drücken.">Erfindet viele Stempel bei 0,5</button>
+  <button data-ok data-why="Grob gefunden wird fast alles, nur eng sitzen die Boxen oft nicht. Für eure Prüfung meist harmlos.">Findet Objekte, Boxen sitzen locker</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>4. Wonach wählt RF-DETR standardmäßig den besten Checkpoint?</p>
+  <button data-ok data-why="best_model_metric=&quot;map&quot; heißt mAP 50:95. Das bevorzugt pixelgenaue Boxen.">nach mAP 50:95</button>
+  <button data-why="Der F1 sweep wird nur geloggt, er wählt keinen Checkpoint.">nach F1 sweep</button>
+  <button data-why="mAP 50 wäre für euch vielleicht passender, ist aber nicht der Standard.">nach mAP 50</button>
+  <p class="feedback"></p>
+</div>
+
+<h2>Erklär es einem Laien</h2>
+<p>Dein Chef liest im Bericht „mAP 50 = 0,77“ und fragt, ob das Modell also 77 % der Unterschriften erkennt. Antworte in zwei bis drei Sätzen.</p>
+<label for="lay4" class="sidenote">Deine Antwort (wird nicht gespeichert)</label>
+<textarea id="lay4"></textarea>
+<details>
+  <summary>Eine mögliche Antwort</summary>
+  <p>„Nicht ganz. Die Zahl bewertet, wie gut das Modell seine sicheren und unsicheren Treffer sortiert, über alle möglichen
+  Einstellungen hinweg. 1,0 hieße: Erst kommen alle echten Stempel und Unterschriften, dann erst Fehlalarme. Für einen Modellvergleich
+  ist das gut. Wie viele Dokumente bei unserer Einstellung richtig geprüft werden, müssen wir aber gesondert messen.“</p>
+</details>
+
+<div class="callout callout--source">
+  <p><a href="https://github.com/rafaelpadilla/Object-Detection-Metrics">Rafael Padilla: Object-Detection-Metrics</a>, Abschnitte „Precision x Recall curve“
+  und „Average Precision“. Dort wird dieselbe Rechnung mit Bildern Schritt für Schritt vorgeführt (ca. 15 Minuten).
+  Danach lohnt ein Blick auf die Tabelle der 12 Metriken bei <a href="https://cocodataset.org/#detection-eval">COCO Detection Evaluation</a>.</p>
+</div>
+
+<div class="callout callout--ask">
+  <p>Frag mich, wenn etwas hakt, zum Beispiel: „Warum 101 Recall-Stufen und nicht die echte Fläche?“ oder
+  „Können wir den besten Checkpoint nach mAP 50 auswählen?“</p>
+</div>
+
+<nav class="lesson-nav">
+  <a href="0003-iou.html">← Lektion 3: Wann sitzt eine Box?</a>
+  <a href="../reference/metriken-spickzettel.html">Spickzettel</a>
+  <span>Nächste: Lektion 5 · mAR (folgt)</span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+<script src="../assets/exercise.js"></script>
+<script src="../assets/ap-curve.js"></script>
+</body>
+</html>

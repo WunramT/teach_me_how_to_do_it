@@ -19,4 +19,7 @@
 - Lektion 2 fertig (F1, Makro, Sweep, Schwelle nach Anforderung). Simulator kann jetzt mehrere Klassen und einen Sweep-Knopf.
 - Lektion 3 fertig (IoU, doppelte Strafe, Matching nach Konfidenz). Neue Komponente assets/iou-box.js.
 - Offene Hypothese für den Nutzer: mAP50 ist für die Vollständigkeitsprüfung aussagekräftiger als mAP75 (unscharfe Ränder, Annotationsunsicherheit). In Lektion 4/6 prüfen.
+- Lektion 4 fertig (PR-Kurve, COCO-AP, mAP 50/75/50:95, best_model_metric). Neue Komponente assets/ap-curve.js (auch in node testbar).
+- RF-DETR 1.10.1 config: best_model_metric="map" (= mAP 50:95) Standard, Alternative "mar"; eval_max_dets=500; log_per_class_metrics=False (Tabelle pro Klasse standardmäßig aus!).
+- mAP-Backend: torchmetrics MeanAveragePrecision mit backend="faster_coco_eval" (COCO-kompatibel).
 - Lehrplan (Entwurf): 1 TP/FP/FN + Precision/Recall · 2 Schwelle & F1 sweep · 3 IoU · 4 AP/mAP@50/75/50:95 · 5 mAR · 6 Die ganze Tabelle lesen + Dokumentebene.

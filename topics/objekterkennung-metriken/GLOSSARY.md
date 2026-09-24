@@ -47,3 +47,11 @@ _Avoid_: Durchschnitt (ohne Zusatz)
 **F1 sweep**:
 Die RF-DETR-Suche über 101 Konfidenzschwellen nach dem höchsten Makro-F1. Die Tabelle zeigt F1, Prec und Recall an dieser Schwelle, die Schwelle selbst aber nicht.
 _Avoid_: Best-F1, optimales F1
+
+**IoU (Intersection over Union)**:
+Fläche des Schnitts geteilt durch die Fläche der Vereinigung von Box und Ground-Truth-Box, zwischen 0 und 1.
+_Avoid_: Überlappung (ohne Zusatz), Jaccard
+
+**IoU-Schwelle**:
+Mindest-IoU, ab der eine Box als TP zählt. Nicht verwechseln mit der Konfidenzschwelle.
+_Avoid_: Schwelle (ohne Zusatz)

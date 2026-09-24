@@ -65,13 +65,25 @@ beim ONNX-Export setzt ihr sie selbst. F1 gewichtet FP und FN gleich. Sind Fehla
 (z. B. „Precision ≥ 0,95“, dann höchster Recall) oder nutze <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html">F-beta</a> mit β &lt; 1.
 Details in <a href="../lessons/0002-f1-sweep.html">Lektion 2</a>.</p>
 
+<h2>AP und mAP (COCO-Regel)</h2>
+<ol>
+  <li>Boxen einer Klasse nach Konfidenz sortieren und nach jeder Box P und R rechnen. Das ergibt die Precision-Recall-Kurve.</li>
+  <li>Glätten: Jeder Punkt bekommt die höchste Precision rechts von ihm.</li>
+  <li>An 101 Recall-Stufen (0,00 bis 1,00) ablesen. Nie erreichter Recall zählt 0.</li>
+  <li>AP = Mittel der 101 Werte. mAP = Mittel über die Klassen. AP 50:95 = Mittel über IoU 0,50, 0,55 bis 0,95.</li>
+</ol>
+<p class="sidenote">AP bewertet die Rangfolge über <i>alle</i> Schwellen und eignet sich zum Vergleichen von Modellen und Checkpoints.
+Über die Tauglichkeit entscheiden P und R an <i>eurer</i> Schwelle. Ist mAP 50 hoch und mAP 75 niedrig, werden die Objekte gefunden, aber die Boxen sitzen locker.
+RF-DETR wählt den besten Checkpoint standardmäßig nach mAP 50:95 (<code>best_model_metric="map"</code>), Alternative ist <code>"mar"</code>.
+Quelle: <code>pycocotools/cocoeval.py</code> (<code>accumulate</code>). Details in <a href="../lessons/0004-ap-und-map.html">Lektion 4</a>.</p>
+
 <h2>Die RF-DETR-Tabelle, Spalte für Spalte</h2>
 <div class="table-wrap">
 <table>
   <tr><th>Gruppe</th><th>Spalte</th><th>Kurz</th><th>Lektion</th></tr>
-  <tr><td rowspan="3">mAP</td><td>50:95</td><td>AP gemittelt über IoU 0,50 bis 0,95 (Schritt 0,05) und über die Klassen. Die COCO-Hauptmetrik.</td><td>4</td></tr>
-  <tr><td>50</td><td>AP bei IoU 0,50. Die Box muss nur grob sitzen.</td><td>4</td></tr>
-  <tr><td>75</td><td>AP bei IoU 0,75. Die Box muss eng sitzen.</td><td>4</td></tr>
+  <tr><td rowspan="3">mAP</td><td>50:95</td><td>AP gemittelt über IoU 0,50 bis 0,95 (Schritt 0,05) und über die Klassen. Die COCO-Hauptmetrik.</td><td><a href="../lessons/0004-ap-und-map.html">4</a></td></tr>
+  <tr><td>50</td><td>AP bei IoU 0,50. Die Box muss nur grob sitzen.</td><td><a href="../lessons/0004-ap-und-map.html">4</a></td></tr>
+  <tr><td>75</td><td>AP bei IoU 0,75. Die Box muss eng sitzen.</td><td><a href="../lessons/0004-ap-und-map.html">4</a></td></tr>
   <tr><td>mAR</td><td>@N</td><td>Mittlerer Recall bei höchstens N Boxen pro Bild, gemittelt über IoU 0,50 bis 0,95 und die Klassen.</td><td>5</td></tr>
   <tr><td rowspan="3">F1 sweep</td><td>F1</td><td>Bestes Makro-F1 über alle Schwellen 0,00 bis 1,00 (IoU 0,5)</td><td><a href="../lessons/0002-f1-sweep.html">2</a></td></tr>
   <tr><td>Prec</td><td>Makro-Precision an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, <a href="../lessons/0002-f1-sweep.html">2</a></td></tr>
@@ -87,6 +99,7 @@ Das Verhalten des F1 sweep ist im Quellcode von RF-DETR 1.10.1 geprüft (<code>r
   <a href="../lessons/0001-precision-und-recall.html">Lektion 1: Treffer, Fehlalarm, Übersehen</a>
   <a href="../lessons/0002-f1-sweep.html">Lektion 2: Der F1 sweep</a>
   <a href="../lessons/0003-iou.html">Lektion 3: Wann sitzt eine Box?</a>
+  <a href="../lessons/0004-ap-und-map.html">Lektion 4: Die ganze Kurve in einer Zahl</a>
 </nav>
 </body>
 </html>

@@ -148,6 +148,29 @@ nav.lesson-nav { display: flex; justify-content: space-between; margin-top: 3rem
 .iou .stats b.err { color: var(--err); }
 .iou .stats span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
+/* AP-Werkstatt (siehe assets/ap-curve.js) */
+.apc { margin: 1.5rem 0; }
+.apc svg { width: 100%; max-width: 30rem; height: auto; display: block; margin: 0.5rem 0; }
+.apc .tick { fill: var(--muted); font: 0.75rem ui-monospace, Menlo, Consolas, monospace; }
+.apc .apc-grid { stroke: var(--rule); stroke-width: 1; }
+.apc .apc-raw { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.apc .apc-env { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.apc .apc-area { fill: var(--accent); opacity: 0.12; }
+.apc .dot-tp { fill: var(--ok); }
+.apc .dot-fp { fill: var(--err); }
+.apc td.ok { color: var(--ok); font-weight: 600; }
+.apc td.err { color: var(--err); font-weight: 600; }
+.apc table { font-size: 0.85rem; }
+.apc th, .apc td { padding: 0.3rem 0.45rem; }
+.apc .apc-switch { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.apc .apc-switch button { font: inherit; font-size: 0.95rem; color: inherit; background: transparent; cursor: pointer; border: 1px solid var(--rule); border-radius: 4px; padding: 0.3rem 0.8rem; }
+.apc .apc-switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.apc .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 0.5rem 1rem; margin-top: 0.75rem; font-variant-numeric: tabular-nums; }
+.apc .stats div { border-top: 1px solid var(--rule); padding-top: 0.3rem; }
+.apc .stats b { display: block; font-size: 1.4rem; font-weight: 400; }
+.apc .stats span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.apc .legend { font-size: 0.85rem; color: var(--muted); }
+
 /* Formeln */
 .formula { text-align: center; font-size: 1.15rem; margin: 1.25rem 0; }
 .formula .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.3rem; }
@@ -168,5 +191,5 @@ textarea { font: inherit; color: inherit; background: var(--code-bg); width: 100
   :root { --bg: #fff; --fg: #000; }
   body { padding: 0; max-width: none; font-size: 11pt; }
   a { color: inherit; }
-  .quiz button, nav.lesson-nav, .callout--ask, .sim input, .exercise button, .iou-controls, .iou-presets { display: none; }
+  .quiz button, nav.lesson-nav, .callout--ask, .sim input, .exercise button, .iou-controls, .iou-presets, .apc-switch { display: none; }
 }
