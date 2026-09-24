@@ -35,3 +35,15 @@ _Avoid_: Genauigkeit (verwechselbar mit Accuracy)
 **Recall**:
 TP / (TP + FN), also der Anteil der echten Objekte, die gefunden werden.
 _Avoid_: Trefferquote, Sensitivität
+
+**F1**:
+Harmonisches Mittel aus Precision und Recall, 2·P·R / (P + R). Wird vom schwächeren der beiden Werte dominiert.
+_Avoid_: F-Score (ohne Zusatz), Genauigkeit
+
+**Makro-Mittel**:
+Eine Metrik wird zuerst pro Klasse (Stempel, Unterschrift) berechnet und dann gemittelt. Jede Klasse zählt gleich viel.
+_Avoid_: Durchschnitt (ohne Zusatz)
+
+**F1 sweep**:
+Die RF-DETR-Suche über 101 Konfidenzschwellen nach dem höchsten Makro-F1. Die Tabelle zeigt F1, Prec und Recall an dieser Schwelle, die Schwelle selbst aber nicht.
+_Avoid_: Best-F1, optimales F1

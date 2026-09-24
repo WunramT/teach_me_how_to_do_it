@@ -125,6 +125,29 @@ nav.lesson-nav { display: flex; justify-content: space-between; margin-top: 3rem
 .sim th, .sim td { padding: 0.3rem 0.45rem; }
 .sim .legend { font-size: 0.85rem; color: var(--muted); }
 
+/* IoU-Spielwiese (siehe assets/iou-box.js) */
+.iou { margin: 1.5rem 0; }
+.iou svg { width: 100%; height: auto; display: block; border: 1px solid var(--rule); border-radius: 4px; }
+.iou .iou-page { fill: var(--bg); }
+.iou .iou-line { stroke: var(--rule); stroke-width: 1; }
+.iou .iou-ink { fill: none; stroke: var(--fg); stroke-width: 2.5; stroke-linecap: round; }
+.iou .iou-gt { fill: none; stroke: var(--ok); stroke-width: 2; stroke-dasharray: 6 4; }
+.iou .iou-pred { fill: transparent; stroke: var(--accent); stroke-width: 2.5; cursor: move; touch-action: none; }
+.iou .iou-inter { fill: var(--accent); opacity: 0.18; }
+.iou .iou-text { fill: var(--ok); font: 0.8rem ui-monospace, Menlo, Consolas, monospace; }
+.iou .iou-text--pred { fill: var(--accent); }
+.iou .iou-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.25rem 1.25rem; margin-top: 0.75rem; font-size: 0.9rem; }
+.iou .iou-controls input { width: 100%; accent-color: var(--accent); }
+.iou .iou-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.iou .iou-presets button { font: inherit; font-size: 0.9rem; color: inherit; background: transparent; cursor: pointer; border: 1px solid var(--rule); border-radius: 4px; padding: 0.25rem 0.7rem; }
+.iou .iou-presets button:hover { border-color: var(--fg); }
+.iou .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 0.5rem 1rem; margin-top: 0.75rem; font-variant-numeric: tabular-nums; }
+.iou .stats div { border-top: 1px solid var(--rule); padding-top: 0.3rem; }
+.iou .stats b { display: block; font-size: 1.4rem; font-weight: 400; }
+.iou .stats b.ok { color: var(--ok); }
+.iou .stats b.err { color: var(--err); }
+.iou .stats span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
 /* Formeln */
 .formula { text-align: center; font-size: 1.15rem; margin: 1.25rem 0; }
 .formula .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.3rem; }
@@ -145,5 +168,5 @@ textarea { font: inherit; color: inherit; background: var(--code-bg); width: 100
   :root { --bg: #fff; --fg: #000; }
   body { padding: 0; max-width: none; font-size: 11pt; }
   a { color: inherit; }
-  .quiz button, nav.lesson-nav, .callout--ask, .sim input, .exercise button { display: none; }
+  .quiz button, nav.lesson-nav, .callout--ask, .sim input, .exercise button, .iou-controls, .iou-presets { display: none; }
 }

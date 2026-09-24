@@ -12,6 +12,8 @@
   Peer-reviewter Überblick: TP/FP/FN über IoU, Interpolation, Unterschiede der Tools. Use for: Wie wird AP genau gerechnet?
 - [scikit-learn User Guide 3.3: Tuning the decision threshold](https://scikit-learn.org/stable/modules/classification_threshold.html) · [fbeta_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html)
   Warum 0,5 selten passt und wie man die Schwelle nach dem Ziel der Anwendung wählt. F-beta gewichtet P und R unterschiedlich. Use for: Schwellenwahl (Lektion 2, 6).
+- [Rafael Padilla: Object-Detection-Metrics (GitHub)](https://github.com/rafaelpadilla/Object-Detection-Metrics)
+  Vorarbeit zum Artikel von 2021, mit klaren Bildern zu IoU, TP/FP/FN (TN „does not apply“), Doppel-Detektionen und AP-Kurven. Use for: Lektion 3–4.
 - [RF-DETR Quellcode (roboflow/rf-detr)](https://github.com/roboflow/rf-detr)
   Maßgeblich dafür, was *unsere* Tabelle zeigt. Geprüft in v1.10.1: `rfdetr/utilities/console.py` (Tabelle),
   `rfdetr/evaluation/f1_sweep.py` + `rfdetr/training/callbacks/coco_eval.py` (F1 sweep). Use for: Details der Spalten.

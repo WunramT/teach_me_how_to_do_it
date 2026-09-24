@@ -20,9 +20,19 @@
   <tr><td><b>FN</b></td><td>Echtes Objekt ohne Box (übersehen)</td><td>Blasser Stempel fehlt</td></tr>
 </table>
 </div>
-<p class="sidenote">„Trifft“ heißt: Die Überlappung (IoU) liegt über einer Schwelle. Im F1 sweep von RF-DETR ist das 0,5.
+<p class="sidenote">„Trifft“ heißt: Die Überlappung (IoU) erreicht eine Schwelle, siehe unten. Im F1 sweep von RF-DETR ist das 0,5.
 Eine Box darf nur ein Objekt treffen. True Negatives gibt es bei der Detektion nicht
-(<a href="https://doi.org/10.3390/electronics10030279">Padilla et al. 2021</a>).</p>
+(<a href="https://github.com/rafaelpadilla/Object-Detection-Metrics">Padilla: Object-Detection-Metrics</a>).</p>
+
+<h2>IoU: wann eine Box sitzt</h2>
+<div class="formula">IoU = <span class="frac"><span>Schnitt</span><span>Vereinigung</span></span>
+  &nbsp;·&nbsp; Vereinigung = A + B − Schnitt</div>
+<ul>
+  <li>TP, wenn IoU ≥ IoU-Schwelle (RF-DETR prüft „≥“). Darunter wird die Box zum <b>FP</b> und das Objekt zum <b>FN</b> (doppelte Strafe).</li>
+  <li>Eine doppelt so breite Box, die das Objekt ganz enthält, hat IoU = 0,50.</li>
+  <li>Matching: Boxen pro Klasse nach Konfidenz absteigend. Jede nimmt die freie Ground Truth mit dem höchsten IoU. Jedes Objekt wird höchstens einmal vergeben, weitere Boxen darauf sind FP (<code>rfdetr/evaluation/matching.py</code>).</li>
+</ul>
+<p class="sidenote">Details in <a href="../lessons/0003-iou.html">Lektion 3</a>. Quelle: <a href="https://github.com/rafaelpadilla/Object-Detection-Metrics">Padilla: Object-Detection-Metrics</a>.</p>
 
 <h2>Formeln</h2>
 <div class="table-wrap">
@@ -76,6 +86,7 @@ Das Verhalten des F1 sweep ist im Quellcode von RF-DETR 1.10.1 geprüft (<code>r
 <nav class="lesson-nav">
   <a href="../lessons/0001-precision-und-recall.html">Lektion 1: Treffer, Fehlalarm, Übersehen</a>
   <a href="../lessons/0002-f1-sweep.html">Lektion 2: Der F1 sweep</a>
+  <a href="../lessons/0003-iou.html">Lektion 3: Wann sitzt eine Box?</a>
 </nav>
 </body>
 </html>
