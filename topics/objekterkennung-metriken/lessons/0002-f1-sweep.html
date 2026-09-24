@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Der F1 sweep</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<h1>Der F1 sweep</h1>
+<p class="subtitle">Lektion 2 · F1, Makro-Mittel und die Wahl der Konfidenzschwelle · ca. 12 Minuten</p>
+
+<p>Heute geht es um die rechte Gruppe der RF-DETR-Tabelle:</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th colspan="3">mAP</th><th>mAR</th><th colspan="3">F1 sweep</th></tr>
+  <tr><td>50:95</td><td>50</td><td>75</td><td>@500</td><td><b>F1</b></td><td><b>Prec</b></td><td><b>Recall</b></td></tr>
+</table>
+</div>
+
+<p>Danach weißt du genau, wie die drei Zahlen entstehen. Du weißt auch, welche Information in der Tabelle
+<i>fehlt</i> und warum die Schwelle mit dem besten F1 für eure Vollständigkeitsprüfung wahrscheinlich nicht die richtige ist.</p>
+
+<h2>Aufwärmen: Lektion 1 abrufen</h2>
+
+<div class="quiz">
+  <p>Durch welche Zahl teilt die Precision?</p>
+  <button data-why="Das ist der Nenner des Recall.">Alle echten Objekte</button>
+  <button data-ok data-why="TP / (TP + FP): alles, was das Modell meldet.">Alle gemeldeten Boxen</button>
+  <button data-why="Die Konfidenz ist kein Nenner. Sie entscheidet nur, welche Boxen zählen.">Alle Konfidenzwerte zusammen</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>Du hebst die Schwelle an. Welcher Fehler wird dadurch seltener?</p>
+  <button data-why="FN werden beim Anheben häufiger, weil mehr echte Objekte unter die Schwelle fallen.">FN</button>
+  <button data-ok data-why="Weniger Boxen überleben, vor allem unsichere Fehlalarme fallen weg.">FP</button>
+  <button data-why="TP sind kein Fehler, sie werden beim Anheben eher weniger.">TP</button>
+  <p class="feedback"></p>
+</div>
+
+<h2>F1: eine Zahl für beide</h2>
+
+<p>Precision und Recall ziehen gegeneinander. Um Schwellen vergleichen zu können, fasst man beide in einer Zahl zusammen,
+dem <b>F1</b>. F1 ist das <i>harmonische</i> Mittel
+(<a href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall">Google MLCC</a>):</p>
+
+<div class="formula">F1 =
+  <span class="frac"><span>2 · Precision · Recall</span><span>Precision + Recall</span></span></div>
+
+<p>Das harmonische Mittel wird vom <i>schwächeren</i> Wert nach unten gezogen. Ein Modell mit Precision 1,00 und
+Recall 0,10 meldet nur wenige Boxen und liegt damit immer richtig. Es übersieht aber 9 von 10 Unterschriften.
+Der normale Durchschnitt wäre 0,55 und klänge ordentlich. F1 ergibt 0,18 und zeigt, dass das Modell unbrauchbar ist.</p>
+
+<h2>Was „sweep“ bedeutet</h2>
+
+<p>RF-DETR probiert nach jeder Validierung <b>101 Schwellen</b> durch: 0,00, 0,01, 0,02 bis 1,00. Für jede Schwelle passiert Folgendes:</p>
+<ol>
+  <li>Precision, Recall und F1 werden <b>pro Klasse</b> berechnet, einmal für Stempel und einmal für Unterschrift.
+      Eine Box zählt als Treffer, wenn sie mit IoU ≥ 0,5 auf einem echten Objekt sitzt.</li>
+  <li>Die Werte werden über die Klassen gemittelt. Dieses <b>Makro-Mittel</b> gibt jeder Klasse dasselbe Gewicht,
+      egal wie viele Objekte sie hat.</li>
+</ol>
+<p>Gewinner ist die Schwelle mit dem höchsten <b>Makro-F1</b>. In die Tabelle kommen deren F1, Precision und Recall.</p>
+
+<p class="sidenote">Geprüft im Quellcode von RF-DETR 1.10.1 (<a href="https://github.com/roboflow/rf-detr">roboflow/rf-detr</a>):
+<code>rfdetr/training/callbacks/coco_eval.py</code> ruft <code>sweep_confidence_thresholds(…, np.linspace(0, 1, 101), …)</code> auf und wählt
+<code>max(…, key=macro_f1)</code>. Die Formeln stehen in <code>rfdetr/evaluation/f1_sweep.py</code>. Die Tabelle pro Klasse zeigt F1, Precision und Recall
+jeder Klasse bei <i>derselben</i> Gewinner-Schwelle.</p>
+
+<div class="callout">
+  <p><b>Die Lücke in der Tabelle:</b> Die Gewinner-Schwelle selbst wird <i>nicht</i> ausgegeben.
+  Du siehst also, wie gut das Modell an seiner besten Schwelle ist, aber nicht, wo diese Schwelle liegt.
+  Auch <code>model.predict()</code> nutzt sie nicht automatisch, der Standardwert dort ist <code>threshold=0.5</code>.
+  Beim ONNX-Export setzt ihr die Schwelle ohnehin selbst in eurer Nachverarbeitung.</p>
+</div>
+
+<h2>Selbst sweepen</h2>
+
+<p>Hier sind zwei Klassen auf einem Stapel Beispieldokumenten: 4 echte Stempel und 5 echte Unterschriften.
+Bewege den Regler und beobachte die Makro-Zeile. Drücke dann den Knopf, der genau das tut, was RF-DETR tut.</p>
+
+<div class="sim" data-gt='{"Stempel":4,"Unterschrift":5}' data-start="0.5" data-sweep="true" data-dets='[
+  {"s":0.95,"tp":true,"c":"Stempel","l":"Firmenstempel"},
+  {"s":0.90,"tp":true,"c":"Stempel","l":"Eingangsstempel"},
+  {"s":0.80,"tp":false,"c":"Stempel","l":"Logo im Briefkopf"},
+  {"s":0.72,"tp":true,"c":"Stempel","l":"Notarstempel"},
+  {"s":0.55,"tp":false,"c":"Stempel","l":"Rundes Wasserzeichen"},
+  {"s":0.38,"tp":true,"c":"Stempel","l":"Blasser Stempel"},
+  {"s":0.30,"tp":false,"c":"Stempel","l":"Scanfleck"},
+  {"s":0.96,"tp":true,"c":"Unterschrift","l":"Unterschrift Käufer"},
+  {"s":0.91,"tp":true,"c":"Unterschrift","l":"Unterschrift Verkäufer"},
+  {"s":0.85,"tp":true,"c":"Unterschrift","l":"Unterschrift Zeuge"},
+  {"s":0.70,"tp":false,"c":"Unterschrift","l":"Kugelschreiber-Kritzel"},
+  {"s":0.66,"tp":true,"c":"Unterschrift","l":"Kürzel am Rand"},
+  {"s":0.47,"tp":true,"c":"Unterschrift","l":"Unterschrift über Stempel"},
+  {"s":0.44,"tp":false,"c":"Unterschrift","l":"Handschriftliche Notiz"},
+  {"s":0.25,"tp":false,"c":"Unterschrift","l":"Unterstrichene Zeile"}
+]'></div>
+
+<details>
+  <summary>Was fällt dir auf?</summary>
+  <p>Der Sweep landet bei <b>0,31</b>. Makro-F1 = 0,82, Makro-Recall = 1,00, Makro-Precision nur 0,69.
+  In der RF-DETR-Tabelle stünde also etwa <code>F1 0.8167 · Prec 0.6905 · Recall 1.0000</code>.
+  Das sieht gut aus, bedeutet an dieser Schwelle aber <b>4 Fehlalarme</b>: Logo, Wasserzeichen, Kritzel und Notiz.
+  Für eure Prüfung kann jeder davon einen fehlenden Stempel oder eine fehlende Unterschrift verdecken.
+  Stell den Regler auf 0,85: Fehlalarme 0, Makro-F1 0,71, dafür übersieht das Modell mehr.</p>
+</details>
+
+<h2>Warum F1 nicht eure Schwelle wählt</h2>
+
+<p>F1 gewichtet Fehlalarme und Übersehenes <b>gleich</b>. Für die Vollständigkeitsprüfung ist das selten richtig:</p>
+<ul>
+  <li>Ein <b>FP</b> lässt ein unvollständiges Dokument durchrutschen. Den Fehler bemerkt womöglich niemand.</li>
+  <li>Ein <b>FN</b> löst eine unnötige Nachprüfung aus. Das ist lästig, aber sichtbar.</li>
+</ul>
+<p>Ist Durchrutschen teurer, suchst du die Schwelle nach eurer Anforderung aus, zum Beispiel
+„Precision mindestens 0,95“. Unter dieser Bedingung nimmst du dann den höchsten Recall. Die scikit-learn-Doku
+empfiehlt genau das: die Schwelle nach dem Ziel der Anwendung zu wählen, nicht nach einem Standardwert
+(<a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn: Tuning the decision threshold</a>).</p>
+
+<p class="sidenote">Wer trotzdem eine Kennzahl will: Das <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html">F-beta-Maß</a>
+mit β = 0,5 gewichtet die Precision doppelt so stark wie den Recall. RF-DETR gibt nur F1 aus.</p>
+
+<h2>Übung: aus einem Sweep die Schwelle wählen</h2>
+
+<p>Ein Sweep auf eurem Validierungsset hätte diese Makrowerte ergeben:</p>
+
+<div class="table-wrap">
+<table>
+  <tr><th>Schwelle</th><th>Precision</th><th>Recall</th><th>F1</th></tr>
+  <tr><td>0,30</td><td>0,60</td><td>0,95</td><td>0,74</td></tr>
+  <tr><td>0,50</td><td>0,80</td><td>0,88</td><td>?</td></tr>
+  <tr><td>0,70</td><td>0,92</td><td>0,75</td><td>?</td></tr>
+  <tr><td>0,90</td><td>0,97</td><td>0,50</td><td>0,66</td></tr>
+</table>
+</div>
+
+<form class="exercise">
+  <div class="row"><label for="ex2-f50">F1 bei 0,50</label><input id="ex2-f50" inputmode="decimal" data-answer="0.838" data-tol="0.01"></div>
+  <div class="row"><label for="ex2-f70">F1 bei 0,70</label><input id="ex2-f70" inputmode="decimal" data-answer="0.826" data-tol="0.01"></div>
+  <div class="row"><label for="ex2-best">Schwelle, die RF-DETR wählt</label><input id="ex2-best" inputmode="decimal" data-answer="0.5"></div>
+  <div class="row"><label for="ex2-req">Schwelle bei „Precision ≥ 0,95“</label><input id="ex2-req" inputmode="decimal" data-answer="0.9"></div>
+  <button>Prüfen</button>
+  <p class="feedback" data-done="RF-DETR würde F1 0,84 · Prec 0,80 · Recall 0,88 melden. Eure Anforderung erfüllt aber erst 0,90. Dort übersieht das Modell die Hälfte, jedes zweite vollständige Dokument ginge also in die Nachprüfung. Ob das tragbar ist, ist eine fachliche Entscheidung, keine der Metrik."></p>
+</form>
+
+<h2>Abrufen</h2>
+
+<div class="quiz">
+  <p>1. Precision 1,00 und Recall 0,10. Wie hoch ist F1?</p>
+  <button data-why="0,55 wäre der normale Durchschnitt, F1 ist aber das harmonische Mittel.">etwa 0,55</button>
+  <button data-why="F1 liegt immer zwischen den beiden Werten, außer einer davon ist 0.">genau 0,10</button>
+  <button data-ok data-why="2 · 1 · 0,1 / 1,1 ≈ 0,18. Der schwächere Wert zieht das Ergebnis nach unten.">etwa 0,18</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>2. Was steht in der Spalte „Prec“ unter F1 sweep?</p>
+  <button data-ok data-why="Die Makro-Precision genau an der Schwelle mit dem höchsten Makro-F1.">Precision an der besten F1-Schwelle</button>
+  <button data-why="Die Schwelle 0,5 ist nur der Standardwert von predict(), nicht die Schwelle des Sweep.">Precision bei der Standardschwelle 0,5</button>
+  <button data-why="Es wird nicht über Schwellen gemittelt. Es gewinnt eine einzige Schwelle.">Durchschnitt der Precision aller Schwellen</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>3. Was heißt „Makro“ beim Makro-F1?</p>
+  <button data-why="So würde eine häufige Klasse das Ergebnis dominieren. Das wäre ein Mikro-Mittel.">Alle Boxen gemeinsam zählen</button>
+  <button data-ok data-why="Erst F1 für Stempel und für Unterschrift, dann das Mittel. Jede Klasse zählt gleich viel.">Jede Klasse zählt gleich viel</button>
+  <button data-why="Die Schwellen werden durchprobiert, nicht gemittelt.">Alle Schwellen werden gemittelt</button>
+  <p class="feedback"></p>
+</div>
+
+<div class="quiz">
+  <p>4. Bei euch sind Fehlalarme teurer als Übersehenes. Wo liegt eure Schwelle im Vergleich zur F1-Schwelle?</p>
+  <button data-why="Eine niedrigere Schwelle lässt noch mehr Fehlalarme durch.">eher niedriger als diese</button>
+  <button data-why="Die F1-Schwelle gewichtet FP und FN gleich, eure Kosten sind aber ungleich.">genau dieselbe Schwelle</button>
+  <button data-ok data-why="Eine höhere Schwelle bedeutet weniger FP. Der Preis ist mehr FN, also mehr Nachprüfungen.">eher höher als diese</button>
+  <p class="feedback"></p>
+</div>
+
+<h2>Erklär es einem Laien</h2>
+<p>Dein Chef sieht „F1 0,82“ und fragt: „Also 82 % richtig, dann können wir starten?“ Antworte in zwei bis drei Sätzen.</p>
+<label for="lay2" class="sidenote">Deine Antwort (wird nicht gespeichert)</label>
+<textarea id="lay2"></textarea>
+<details>
+  <summary>Eine mögliche Antwort</summary>
+  <p>„Die 0,82 ist ein Kompromiss aus zwei Fragen: Wie oft stimmt ein Treffer, und wie viel wird gefunden?
+  Er gilt für die Einstellung, bei der beides zusammen am besten aussieht. Bei dieser Einstellung erfindet das Modell aber
+  noch zu oft Stempel, und genau das ist für uns gefährlich. Wir müssen die Einstellung nach unserem Risiko wählen und dann
+  prüfen, wie viele Dokumente noch von Hand angesehen werden müssen.“</p>
+</details>
+
+<div class="callout callout--source">
+  <p><a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn User Guide 3.3: Tuning the decision threshold for class prediction</a>.
+  Die Seite erklärt, warum 0,5 selten die richtige Schwelle ist und wie man sie nach dem Ziel der Anwendung wählt.
+  Es geht dort um Klassifikation, die Logik gilt für eure Boxen genauso (ca. 15 Minuten, die Abschnitte bis „Post-tuning“ reichen).</p>
+</div>
+
+<div class="callout callout--ask">
+  <p>Frag mich, wenn etwas hakt, zum Beispiel: „Wie finde ich die Gewinner-Schwelle für unser Modell heraus?“
+  Das bauen wir in Lektion 6 gemeinsam, gern mit euren echten Validierungsdaten.</p>
+</div>
+
+<nav class="lesson-nav">
+  <a href="0001-precision-und-recall.html">← Lektion 1: Treffer, Fehlalarm, Übersehen</a>
+  <a href="../reference/metriken-spickzettel.html">Spickzettel</a>
+  <span>Nächste: Lektion 3 · IoU (folgt)</span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+<script src="../assets/exercise.js"></script>
+<script src="../assets/threshold-sim.js"></script>
+</body>
+</html>

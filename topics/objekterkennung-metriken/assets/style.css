@@ -121,6 +121,8 @@ nav.lesson-nav { display: flex; justify-content: space-between; margin-top: 3rem
 .sim .stats div { border-top: 1px solid var(--rule); padding-top: 0.3rem; }
 .sim .stats b { display: block; font-size: 1.4rem; font-weight: 400; }
 .sim .stats span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.sim table { font-size: 0.85rem; }
+.sim th, .sim td { padding: 0.3rem 0.45rem; }
 .sim .legend { font-size: 0.85rem; color: var(--muted); }
 
 /* Formeln */

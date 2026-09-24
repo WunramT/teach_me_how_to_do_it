@@ -10,6 +10,8 @@
   Offizielle Definition von AP, AP50, AP75, AR@maxDets; „AP = mAP“, gemittelt über IoU .50:.05:.95. Use for: mAP- und mAR-Spalten.
 - [Padilla et al. (2021): A Comparative Analysis of Object Detection Metrics](https://doi.org/10.3390/electronics10030279) · [Toolkit auf GitHub](https://github.com/rafaelpadilla/review_object_detection_metrics)
   Peer-reviewter Überblick: TP/FP/FN über IoU, Interpolation, Unterschiede der Tools. Use for: Wie wird AP genau gerechnet?
+- [scikit-learn User Guide 3.3: Tuning the decision threshold](https://scikit-learn.org/stable/modules/classification_threshold.html) · [fbeta_score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html)
+  Warum 0,5 selten passt und wie man die Schwelle nach dem Ziel der Anwendung wählt. F-beta gewichtet P und R unterschiedlich. Use for: Schwellenwahl (Lektion 2, 6).
 - [RF-DETR Quellcode (roboflow/rf-detr)](https://github.com/roboflow/rf-detr)
   Maßgeblich dafür, was *unsere* Tabelle zeigt. Geprüft in v1.10.1: `rfdetr/utilities/console.py` (Tabelle),
   `rfdetr/evaluation/f1_sweep.py` + `rfdetr/training/callbacks/coco_eval.py` (F1 sweep). Use for: Details der Spalten.

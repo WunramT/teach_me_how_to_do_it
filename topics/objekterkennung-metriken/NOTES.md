@@ -15,4 +15,6 @@
   Die gewählte Schwelle selbst steht NICHT in der Gesamttabelle → in späterer Lektion thematisieren.
 - mAR-Label zeigt maxDets (Default im Callback: 500).
 - Kern-Einsicht für die Mission: Ein FP (erfundener Stempel) lässt ein unvollständiges Dokument als vollständig durchgehen.
+- RF-DETR predict(): Standard threshold=0.5; die Tabelle pro Klasse zeigt F1/P/R jeder Klasse bei der Makro-Gewinner-Schwelle.
+- Lektion 2 fertig (F1, Makro, Sweep, Schwelle nach Anforderung). Simulator kann jetzt mehrere Klassen und einen Sweep-Knopf.
 - Lehrplan (Entwurf): 1 TP/FP/FN + Precision/Recall · 2 Schwelle & F1 sweep · 3 IoU · 4 AP/mAP@50/75/50:95 · 5 mAR · 6 Die ganze Tabelle lesen + Dokumentebene.

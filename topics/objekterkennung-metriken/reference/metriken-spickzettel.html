@@ -44,6 +44,17 @@ Faustregel: Eine <b>höhere</b> Konfidenzschwelle bedeutet weniger FP und mehr F
 </table>
 </div>
 
+<h2>F1 sweep in RF-DETR</h2>
+<ol>
+  <li>101 Schwellen (0,00 bis 1,00, Schritt 0,01), Matching bei IoU ≥ 0,5.</li>
+  <li>Pro Schwelle: P, R und F1 je Klasse, dann das Makro-Mittel über die Klassen.</li>
+  <li>Gewinner ist das höchste Makro-F1. Die Tabelle zeigt dessen F1, Prec und Recall. Die Tabelle pro Klasse nutzt dieselbe Schwelle.</li>
+</ol>
+<p class="sidenote"><b>Nicht in der Tabelle:</b> die Gewinner-Schwelle selbst. <code>model.predict()</code> nutzt standardmäßig <code>threshold=0.5</code>,
+beim ONNX-Export setzt ihr sie selbst. F1 gewichtet FP und FN gleich. Sind Fehlalarme teurer, wähle eine Schwelle nach Anforderung
+(z. B. „Precision ≥ 0,95“, dann höchster Recall) oder nutze <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html">F-beta</a> mit β &lt; 1.
+Details in <a href="../lessons/0002-f1-sweep.html">Lektion 2</a>.</p>
+
 <h2>Die RF-DETR-Tabelle, Spalte für Spalte</h2>
 <div class="table-wrap">
 <table>
@@ -52,9 +63,9 @@ Faustregel: Eine <b>höhere</b> Konfidenzschwelle bedeutet weniger FP und mehr F
   <tr><td>50</td><td>AP bei IoU 0,50. Die Box muss nur grob sitzen.</td><td>4</td></tr>
   <tr><td>75</td><td>AP bei IoU 0,75. Die Box muss eng sitzen.</td><td>4</td></tr>
   <tr><td>mAR</td><td>@N</td><td>Mittlerer Recall bei höchstens N Boxen pro Bild, gemittelt über IoU 0,50 bis 0,95 und die Klassen.</td><td>5</td></tr>
-  <tr><td rowspan="3">F1 sweep</td><td>F1</td><td>Bestes Makro-F1 über alle Schwellen 0,00 bis 1,00 (IoU 0,5)</td><td>2</td></tr>
-  <tr><td>Prec</td><td>Makro-Precision an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, 2</td></tr>
-  <tr><td>Recall</td><td>Makro-Recall an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, 2</td></tr>
+  <tr><td rowspan="3">F1 sweep</td><td>F1</td><td>Bestes Makro-F1 über alle Schwellen 0,00 bis 1,00 (IoU 0,5)</td><td><a href="../lessons/0002-f1-sweep.html">2</a></td></tr>
+  <tr><td>Prec</td><td>Makro-Precision an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, <a href="../lessons/0002-f1-sweep.html">2</a></td></tr>
+  <tr><td>Recall</td><td>Makro-Recall an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, <a href="../lessons/0002-f1-sweep.html">2</a></td></tr>
 </table>
 </div>
 <p class="sidenote">„Makro“ heißt: zuerst pro Klasse (Stempel, Unterschrift) rechnen, dann den Mittelwert bilden.
@@ -64,6 +75,7 @@ Das Verhalten des F1 sweep ist im Quellcode von RF-DETR 1.10.1 geprüft (<code>r
 
 <nav class="lesson-nav">
   <a href="../lessons/0001-precision-und-recall.html">Lektion 1: Treffer, Fehlalarm, Übersehen</a>
+  <a href="../lessons/0002-f1-sweep.html">Lektion 2: Der F1 sweep</a>
 </nav>
 </body>
 </html>
