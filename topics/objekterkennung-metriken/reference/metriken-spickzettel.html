@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spickzettel Detektionsmetriken</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<h1>Spickzettel: Detektionsmetriken</h1>
+<p class="subtitle">Für die RF-DETR-Validierung von Stempeln und Unterschriften · wächst mit jeder Lektion</p>
+
+<h2>Die drei Fälle</h2>
+<div class="table-wrap">
+<table>
+  <tr><th>Fall</th><th>Heißt</th><th>Stempel-Beispiel</th></tr>
+  <tr><td><b>TP</b></td><td>Box trifft ein echtes Objekt</td><td>Box auf dem Firmenstempel</td></tr>
+  <tr><td><b>FP</b></td><td>Box ohne echtes Objekt (Fehlalarm)</td><td>Logo als Stempel erkannt</td></tr>
+  <tr><td><b>FN</b></td><td>Echtes Objekt ohne Box (übersehen)</td><td>Blasser Stempel fehlt</td></tr>
+</table>
+</div>
+<p class="sidenote">„Trifft“ heißt: Die Überlappung (IoU) liegt über einer Schwelle. Im F1 sweep von RF-DETR ist das 0,5.
+Eine Box darf nur ein Objekt treffen. True Negatives gibt es bei der Detektion nicht
+(<a href="https://doi.org/10.3390/electronics10030279">Padilla et al. 2021</a>).</p>
+
+<h2>Formeln</h2>
+<div class="table-wrap">
+<table>
+  <tr><th>Metrik</th><th>Formel</th><th>Frage in Alltagssprache</th></tr>
+  <tr><td>Precision</td><td>TP / (TP + FP)</td><td>Wenn es „Stempel!“ meldet, wie oft stimmt das?</td></tr>
+  <tr><td>Recall</td><td>TP / (TP + FN)</td><td>Von allen echten Stempeln, wie viele findet es?</td></tr>
+  <tr><td>F1</td><td>2 · P · R / (P + R)</td><td>Wie gut sind beide zusammen? (harmonisches Mittel)</td></tr>
+</table>
+</div>
+<p class="sidenote">Quelle: <a href="https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall">Google ML Crash Course</a>.
+Faustregel: Eine <b>höhere</b> Konfidenzschwelle bedeutet weniger FP und mehr FN, also Precision ↑ und Recall ↓.</p>
+
+<h2>Was ein Fehler für die Vollständigkeitsprüfung bedeutet</h2>
+<div class="table-wrap">
+<table>
+  <tr><td><b>FP</b></td><td>Ein fehlender Stempel wird „gesehen“. Das unvollständige Dokument rutscht durch.</td></tr>
+  <tr><td><b>FN</b></td><td>Ein echter Stempel wird übersehen. Das vollständige Dokument wird unnötig angemahnt.</td></tr>
+</table>
+</div>
+
+<h2>Die RF-DETR-Tabelle, Spalte für Spalte</h2>
+<div class="table-wrap">
+<table>
+  <tr><th>Gruppe</th><th>Spalte</th><th>Kurz</th><th>Lektion</th></tr>
+  <tr><td rowspan="3">mAP</td><td>50:95</td><td>AP gemittelt über IoU 0,50 bis 0,95 (Schritt 0,05) und über die Klassen. Die COCO-Hauptmetrik.</td><td>4</td></tr>
+  <tr><td>50</td><td>AP bei IoU 0,50. Die Box muss nur grob sitzen.</td><td>4</td></tr>
+  <tr><td>75</td><td>AP bei IoU 0,75. Die Box muss eng sitzen.</td><td>4</td></tr>
+  <tr><td>mAR</td><td>@N</td><td>Mittlerer Recall bei höchstens N Boxen pro Bild, gemittelt über IoU 0,50 bis 0,95 und die Klassen.</td><td>5</td></tr>
+  <tr><td rowspan="3">F1 sweep</td><td>F1</td><td>Bestes Makro-F1 über alle Schwellen 0,00 bis 1,00 (IoU 0,5)</td><td>2</td></tr>
+  <tr><td>Prec</td><td>Makro-Precision an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, 2</td></tr>
+  <tr><td>Recall</td><td>Makro-Recall an genau dieser besten Schwelle</td><td><a href="../lessons/0001-precision-und-recall.html">1</a>, 2</td></tr>
+</table>
+</div>
+<p class="sidenote">„Makro“ heißt: zuerst pro Klasse (Stempel, Unterschrift) rechnen, dann den Mittelwert bilden.
+Die mAP-Definitionen folgen der <a href="https://cocodataset.org/#detection-eval">COCO Detection Evaluation</a>. Dort gilt: „AP“ und „mAP“ meinen dasselbe.
+Das Verhalten des F1 sweep ist im Quellcode von RF-DETR 1.10.1 geprüft (<code>rfdetr/training/callbacks/coco_eval.py</code>,
+<code>rfdetr/evaluation/f1_sweep.py</code>).</p>
+
+<nav class="lesson-nav">
+  <a href="../lessons/0001-precision-und-recall.html">Lektion 1: Treffer, Fehlalarm, Übersehen</a>
+</nav>
+</body>
+</html>

@@ -4,6 +4,20 @@
 
 ## Knowledge
 
+- [Google ML Crash Course: Accuracy, precision, recall](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall)
+  Kurze, saubere Definitionen von Precision, Recall, F1 und dem Schwellen-Trade-off. Use for: Grundlagen (Lektion 1–2).
+- [COCO Detection Evaluation](https://cocodataset.org/#detection-eval) ([Rohtext](https://raw.githubusercontent.com/cocodataset/cocodataset.github.io/master/dataset/detection-eval.htm))
+  Offizielle Definition von AP, AP50, AP75, AR@maxDets; „AP = mAP“, gemittelt über IoU .50:.05:.95. Use for: mAP- und mAR-Spalten.
+- [Padilla et al. (2021): A Comparative Analysis of Object Detection Metrics](https://doi.org/10.3390/electronics10030279) · [Toolkit auf GitHub](https://github.com/rafaelpadilla/review_object_detection_metrics)
+  Peer-reviewter Überblick: TP/FP/FN über IoU, Interpolation, Unterschiede der Tools. Use for: Wie wird AP genau gerechnet?
+- [RF-DETR Quellcode (roboflow/rf-detr)](https://github.com/roboflow/rf-detr)
+  Maßgeblich dafür, was *unsere* Tabelle zeigt. Geprüft in v1.10.1: `rfdetr/utilities/console.py` (Tabelle),
+  `rfdetr/evaluation/f1_sweep.py` + `rfdetr/training/callbacks/coco_eval.py` (F1 sweep). Use for: Details der Spalten.
+
 ## Wisdom (Communities)
 
+- [Roboflow Forum](https://discuss.roboflow.com/) – Community der RF-DETR-Macher. Use for: Fragen zu RF-DETR-Auswertung.
+- [Cross Validated (stats.stackexchange.com)](https://stats.stackexchange.com/questions/tagged/precision-recall) – moderiert, hohe Qualität. Use for: Fragen zu Metriken allgemein.
+
 ## Gaps
+- Metrik auf **Dokumentebene** („alle Stempel da?“) liefert die Tabelle nicht – dafür brauchen wir später eine eigene Auswertung.

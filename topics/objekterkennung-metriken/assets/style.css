@@ -13,8 +13,10 @@
   --measure: 38rem;
 }
 
+/* Dunkles Theme: folgt dem System, außer es ist explizit hell gewählt;
+   data-theme="dark" erzwingt es. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #151515;
     --fg: #ddd;
     --muted: #999;
@@ -23,7 +25,19 @@
     --code-bg: #222;
     --ok: #81c784;
     --err: #ef9a9a;
+    color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #151515;
+  --fg: #ddd;
+  --muted: #999;
+  --accent: #ff8a80;
+  --rule: #333;
+  --code-bg: #222;
+  --ok: #81c784;
+  --err: #ef9a9a;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -73,9 +87,61 @@ pre code { background: none; padding: 0; }
 /* Navigation zwischen Lektionen */
 nav.lesson-nav { display: flex; justify-content: space-between; margin-top: 3rem; font-size: 0.95rem; }
 
+/* Übung mit Eingabefeldern (siehe assets/exercise.js) */
+.exercise { border: 1px solid var(--rule); border-radius: 4px; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+.exercise .row { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; align-items: center; margin: 0.4rem 0; }
+.exercise label { min-width: 9rem; }
+.exercise input {
+  font: inherit; color: inherit; background: var(--code-bg); width: 6rem;
+  border: 1px solid var(--rule); border-radius: 3px; padding: 0.2rem 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+.exercise input.correct { border-color: var(--ok); }
+.exercise input.wrong { border-color: var(--err); }
+.exercise button, .sim button {
+  font: inherit; color: inherit; background: transparent; cursor: pointer;
+  border: 1px solid var(--fg); border-radius: 4px; padding: 0.35rem 0.9rem; margin-top: 0.5rem;
+}
+.exercise .feedback { font-style: italic; min-height: 1.6em; }
+
+/* Schwellen-Simulator (siehe assets/threshold-sim.js) */
+.sim { margin: 1.5rem 0; }
+.sim svg { width: 100%; height: auto; display: block; overflow: visible; }
+.sim .axis { stroke: var(--muted); }
+.sim .tick { fill: var(--muted); font: 0.95rem ui-monospace, Menlo, Consolas, monospace; }
+.sim .dot-tp { fill: var(--ok); }
+.sim .dot-fp { fill: var(--err); }
+.sim .dot-off { fill: none; stroke-width: 1.5; }
+.sim .dot-off.dot-tp { stroke: var(--ok); }
+.sim .dot-off.dot-fp { stroke: var(--err); }
+.sim .thr { stroke: var(--accent); stroke-width: 2; }
+.sim .thr-label { fill: var(--accent); font: 1rem ui-monospace, Menlo, Consolas, monospace; }
+.sim input[type=range] { width: 100%; accent-color: var(--accent); }
+.sim .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 0.5rem 1rem; margin-top: 0.75rem; font-variant-numeric: tabular-nums; }
+.sim .stats div { border-top: 1px solid var(--rule); padding-top: 0.3rem; }
+.sim .stats b { display: block; font-size: 1.4rem; font-weight: 400; }
+.sim .stats span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.sim .legend { font-size: 0.85rem; color: var(--muted); }
+
+/* Formeln */
+.formula { text-align: center; font-size: 1.15rem; margin: 1.25rem 0; }
+.formula .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.3rem; }
+.formula .frac span:first-child { border-bottom: 1px solid var(--fg); padding: 0 0.3rem; }
+
+/* Tabellen */
+.table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+table { border-collapse: collapse; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+th, td { border-bottom: 1px solid var(--rule); padding: 0.35rem 0.75rem; text-align: left; vertical-align: top; }
+th { font-weight: 600; }
+
+details { margin: 1rem 0; }
+summary { cursor: pointer; color: var(--accent); }
+textarea { font: inherit; color: inherit; background: var(--code-bg); width: 100%; min-height: 4.5rem; border: 1px solid var(--rule); border-radius: 4px; padding: 0.5rem; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 @media print {
   :root { --bg: #fff; --fg: #000; }
   body { padding: 0; max-width: none; font-size: 11pt; }
   a { color: inherit; }
-  .quiz button, nav.lesson-nav, .callout--ask { display: none; }
+  .quiz button, nav.lesson-nav, .callout--ask, .sim input, .exercise button { display: none; }
 }
